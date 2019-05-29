@@ -1,4 +1,4 @@
-"""seonbi URL Configuration
+"""skk URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from . import views
+from seonbi import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index')
+    # path('auth/signup', views.sign_up),
+    # path('auth/signip', views.sign_in)
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
