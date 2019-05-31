@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "seonbi",
+  "private_key_id": "5a2f46a8c31c670d86ce45ba6d975c6462839d40",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5EZRK0thHHKIV\nlg5KTbcxOoFydApVQ+9nV0A+BB//I2coViEHMIIePy4uMQ2auzdnNro4DTH+/c0y\nuzniMpvE7c5xeQLDvanbUzYbquM/NbQOphHGK7XSOB5T5qplujyO25L8Y5hxxWUr\nI4Ll1lGARPG9v+y4LWb/gT4YMpUwU5Ox9L7yp6OsMYFfUpBdXxI3EWGq7rbAUy26\npahKmgPr9H/RPdoI8TBk5pqbpMf761/6JtptW38UQrjMeqeIl5EIiKOECTQa8N6T\nR7USyItMrC5mkqus9hoDIT+eJOiveEa68H4OH/IOFpDmgEpLwrb7cxUnoHJ4jHj3\n4/9LXNPVAgMBAAECggEAAvE3MD+tDb0JjE95VNqVR+x+xtpL7heZUdqxVtsQxCkP\nWIo9VlnXKRJxkkKYOAZzxsm4CQXtWSO2qbC60UW4iWy2HG04q0fTuxIrWSIXdfeN\nWtyZNJNDfdRZEms8zccPHpP561Z3rmVdlU49pEL1mD+1r9cs36+5xGRNClbxiBYL\nzSnbFm5/umNBAOQLDFrQt8sBSEmU9CysIze1JSNcpgLksSR1mss6ajcxDQelGl+S\nFk8Q/f9+U2KD6Z/dbkPTtPoDeJyVW91G90n1ruyjkjy9Kp/ii5Ve0x85ye2pJqD9\nE/MqzATXTvZ8tVmqs++hU9sdTjRP7Em2ssFV2DtKQQKBgQDojTqyVPFtZPROn5EI\nYEQZKkYAAhbgHlVd+uI03iYqKzghexyZU187d4sJXXgpU9Q22oi6avumxJ9yQ8aV\n9fXRtFtYKvWBxtHfTmPjGincV8fkGZlOT+r3cp/H2Ro7iWWUtlHJUpQjT4h9j+bh\nvowAutPoqMVoAAMsvJ+sGaw+QQKBgQDLurBISq87UpDyleS47cMYrYfQzvCN0mJO\n96MX0Kfo5QcicCMTZafvyAFkGjFBY1qYRXq2CO4ROIUAbxUQ5/hX6p1YyjA5w34a\nyrZ+xLfebYQkdI9tA6EJA3DC+k9PUng98H5/3HTlvr+fxqDuIFPIf8f7YR4LiAsX\nvbSV96aYlQKBgBuFe0jXnKrho7gaUkO3gNeplRczKBnl/RxeMJ8pG0MqUj5EH6JV\np5OWFjJJiYr6jMbhHgVR2+5knqobM0lUDn9+5MCOdPei2/udf1zFH+cfzFxGW0pV\nUu1t91LjcqNRI2ByI0O8LiPvqauSeDSHJHKBqcqDDrm8JqQIvqzTbPsBAoGAZPyH\ngW4z6m4FF5qho+GHweXS2viZWVOeE5LBL37onJNatAFuAaF0W3GC7wHkxIrhT3Wx\nXCaVC8g+dXaatKSn/7x2fprKyPdUvScayz/r/L/ArulwZxNTccpYzO2S/rjcjad2\nrR60e2XQSv0ErMUtgseEc+EyKXkoNn5805HM7PkCgYEAobkNG1WMae1uEJA6ynii\nymEt12mTBeuzdgK2HU6gpb2cscf/cglNY/nwtVG8GLu38KLMVK2qN6E+TFurCiZF\n560kIqwYuWuPA6KZPwk/Lq+OtymijNwRr1WPJTz9WtoAt7tWIiXGyan/PUeubgSj\nBhm0hvno5CNfrpWKPbqivS8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "seonbi-uploader@seonbi.iam.gserviceaccount.com",
+  "client_id": "109824921119538830782",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/seonbi-uploader%40seonbi.iam.gserviceaccount.com"
+}

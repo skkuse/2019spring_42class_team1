@@ -1,18 +1,10 @@
 from django.db import models
 
 
-class User(models.Model):
-    id = models.AutoField(primary_key=True)
-    email = models.CharField(max_length=30)
-    password = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class Video(models.Model):
     id = models.AutoField(primary_key=True)
     filename = models.TextField()
     url = models.TextField()
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
