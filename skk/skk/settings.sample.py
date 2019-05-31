@@ -125,5 +125,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 GCP_KEY_PATH = os.path.join(BASE_DIR, 'gcp-key.json')
-NUDE_NET_CLASSIFIER_MODEL_PATH = os.path.join(BASE_DIR, 'seonbi/models/classifier_model')
-NUDE_NET_DETECTOR_MODEL_PATH = os.path.join(BASE_DIR, 'seonbi/models/detector_model')
+NUDE_NET_CLASSIFIER_MODEL_PATH = os.path.join(BASE_DIR, '')
+NUDE_NET_DETECTOR_MODEL_PATH = os.path.join(BASE_DIR, '')
