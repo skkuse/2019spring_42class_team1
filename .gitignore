@@ -3,4 +3,4 @@
 **/settings.py
 **/gcp-key.json
 skk/seonbi/models
-smm/seonbi/migrations
+skk/seonbi/migrations
