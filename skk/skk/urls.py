@@ -16,13 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import include, path
 from seonbi import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index')
-    # path('auth/signup', views.sign_up),
-    # path('auth/signip', views.sign_in)
+    path('', views.index, name='index'),
+    path('videos/', include('seonbi.videos.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
