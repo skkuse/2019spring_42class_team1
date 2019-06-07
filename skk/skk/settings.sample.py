@@ -124,6 +124,15 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Celery
+CELERY_BROKER_URL = 'redis://'
+CELERY_RESULT_BACKEND = 'redis://'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
+CELERY_ENABLE_UTC = False
+
 GCP_KEY_PATH = os.path.join(BASE_DIR, 'gcp-key.json')
 NUDE_NET_CLASSIFIER_MODEL_PATH = os.path.join(BASE_DIR, '')
 NUDE_NET_DETECTOR_MODEL_PATH = os.path.join(BASE_DIR, '')
