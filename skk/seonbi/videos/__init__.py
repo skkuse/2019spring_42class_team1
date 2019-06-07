@@ -15,11 +15,13 @@ gcp_url_format = 'http://storage.googleapis.com/%s/%s'
 
 
 def upload_to_gcp(src_path, gcp_path):
+    print('###### start upload from %s to %s' % (src_path, gcp_path))
     client = storage.Client.from_service_account_json(settings.GCP_KEY_PATH)
     bucket = client.get_bucket(bucket_name)
     blob = Blob(gcp_path, bucket)
     blob.upload_from_filename(src_path)
     blob.make_public()
+    print('##### upload success: ', gcp_url_format % (bucket_name, gcp_path))
     return gcp_url_format % (bucket_name, gcp_path)
 
 
@@ -58,11 +60,11 @@ def detect(src_path, video):
             start_millis = order * interval_millis
             end_millis = (order + 1) * interval_millis
             if not detected:
-                detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=1000, cause=DetectedScene.DetectionCause.NUDITY))
+                detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=end_millis, cause=DetectedScene.DetectionCause.NUDITY))
             else:
                 latest = detected[-1]
                 if latest.end_millis + thresold < latest.start_millis:
-                    detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=1000, cause=DetectedScene.DetectionCause.NUDITY))
+                    detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=end_millis, cause=DetectedScene.DetectionCause.NUDITY))
                 else:
                     latest.end_millis = end_millis
     for scene in detected:

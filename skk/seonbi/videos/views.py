@@ -1,6 +1,6 @@
 from django.core import serializers
 from django.shortcuts import render
-from seonbi.models import Video
+from seonbi.models import Video, DetectedScene
 
 
 def index(request):
@@ -8,4 +8,5 @@ def index(request):
 
 
 def detail(request, video_id):
-    return render(request, 'video_detail.html', {})
+    return render(request, 'video_detail.html', {'video_id': video_id})
+

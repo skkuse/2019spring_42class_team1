@@ -1,14 +1,38 @@
-<!DOCTYPE html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        VIDEO DETAIL
-        <script src="" async defer></script>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% block head %}
+<script type="text/javascript">
+var refresh = function() {
+    $.get("/api/videos/{{video_id}}", function( data ) {
+        var video = data.video;
+        var detectedScenes = data.detected_scenes;
+        console.log(video, detectedScenes)
+        if (!$("#video").attr('src')) {
+            $("#video").attr("src", video.url)
+        }
+        $("#video_info").empty()
+        $("#video_info").append(`<div>${video.status}</div>`)
+        $("#detected_info").empty()
+        for (i = 0; i < detectedScenes.length; i++) {
+            var scene = detectedScenes[i]
+            $("#detected_info").append(`<div class="card" style="width: 18rem;"><img class="card-img-top"><div class="card-body"><h5 class="card-title">${scene.cause}</h5><p class="card-text">${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</p></div></div>`);
+        }
+        if (video.status == "FAILED" || video.status == "DETECTED") {
+            clearInterval(refreshInterval);
+        }
+    });
+}
+
+refresh();
+var refreshInterval = setInterval(function () {
+    refresh();
+}, 5000);
+</script>
+{% endblock %}
+{% block content %}
+<video id="video" src="{{ video.url }}" autobuffer controls style="width: 480px; height: 270px;"></video>
+<div id="video_info">
+</div>
+<div id="detected_info">
+</div>
+{% endblock %}
+

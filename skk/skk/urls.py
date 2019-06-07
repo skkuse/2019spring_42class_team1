@@ -21,6 +21,7 @@ from seonbi import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('seonbi.api.urls')),
     path('', views.index, name='index'),
     path('videos/', include('seonbi.videos.urls')),
 ]

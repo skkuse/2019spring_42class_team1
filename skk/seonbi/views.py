@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from seonbi.utils import current_millis
 from seonbi.models import Video
-from seonbi.tasks import upload_video, detect_scenes
+from seonbi.tasks import upload_and_detect
 
 def index(request):
     if request.method == 'POST':
@@ -24,7 +24,6 @@ def index(request):
 
             now = datetime.datetime.now()
             gcp_path = os.path.join('%d-%d-%d' % (now.year, now.month, now.day), filename)
-            upload_video.delay(video.id, filepath, gcp_path)
-            detect_scenes.delay(video.id, filepath)
+            upload_and_detect.delay(video.id, filepath, gcp_path)
         return HttpResponseRedirect('/videos')
     return render(request, 'index.html', {})
