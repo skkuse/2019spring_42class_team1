@@ -1,0 +1,69 @@
+#menu-container {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 840px) {
+    #button-groups {
+        width: 80%;
+        margin: auto;
+    }
+}
+
+@media (min-width: 840px) {
+    #button-groups {
+        width: 840px;
+        margin: auto;
+    }
+}
+
+#btn-download {
+    float: right;
+    margin-right: 10px;
+}
+
+#btn-delete {
+    float: right;
+}
+
+#video-preview {
+    width: 100%;
+    text-align: center;
+}
+
+@media (max-width: 840px) {
+    #video {
+        width: 80%;
+    }
+}
+
+@media (min-width: 840px) {
+    #video {
+        width: 840px;
+    }
+}
+
+#scene-container {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 840px) {
+    #scene-container table {
+        width: 80%;
+        margin: auto;
+    }
+}
+
+@media (min-width: 840px) {
+    #scene-container table {
+        width: 840px;
+        margin: auto;
+    }
+}
+
+.clickable-row:hover {
+    cursor: pointer;
+}

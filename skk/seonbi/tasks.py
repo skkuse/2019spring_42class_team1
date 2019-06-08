@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from skk.celery import app
 from seonbi.models import Video, DetectedScene
-from seonbi.videos import upload_to_gcp, detect
+from seonbi.videos import upload_to_gcp, detect, delete_gcp_file
 import os
 import ffmpeg
 
@@ -17,6 +17,10 @@ def upload_and_detect(video_id, src_path, gcp_path):
     except:
         video.status = Video.Status.FAILED
         video.save()
+
+@app.task(name='delete_video')
+def delete_video(url):
+    delete_gcp_file(url)
 
 
 @app.task(name='blur_and_upload')

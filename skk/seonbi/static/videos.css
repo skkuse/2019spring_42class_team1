@@ -1,3 +1,17 @@
-.video-item {
-    display: block;
+#video-table {
+    padding: 2rem;
+}
+
+#button-groups {
+    width: 100%;
+    overflow: auto;
+    margin-bottom: 10px;
+}
+
+#btn-upload {
+    float: right;
+}
+
+.clickable-row:hover {
+    cursor: pointer;
 }

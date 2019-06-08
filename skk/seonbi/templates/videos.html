@@ -3,29 +3,40 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'videos.css' %}">
 <script type="text/javascript">
+$(document).ready(function() {
+    $("#btn-upload").click(function () {
+        window.location = "/";
+    })
+
+    $(".clickable-row").click(function () {
+        window.location = $(this).data("href");
+    });
+});
 </script>
 {% endblock %}
 {% block content %}
-<div class="container">
-    {% for video in videos %}
-    <div class="row">
-        <div class="video-item">
-
-        </div>
-        <h5>{{ video.filename }}</h5>
-        <p>{{ video.status }}</p>
-        <p>{{ video.created_at }}</p>
-    </div>
-    {% endfor %}
-    {% for video in videos %}
-    <div class="card" style="width: 18rem;">
-        <img class="card-img-top">
-        <div class="card-body">
-            <h5 class="card-title">{{ video.status }}</h5>
-            <p class="card-text">{{ video.filename }}</p>
-            <a href="/videos/{{ video.id }}" class="btn btn-primary">Go Detail</a>
+<div id="video-table" class="table-responsive">
+    <div id="menu-container">
+        <div id="button-groups">
+            <button id="btn-upload" class="btn btn-primary">Upload Video</button>
         </div>
     </div>
-    {% endfor %}
+    <table class="table table-hover">
+        <thead>
+            <th scope="col">File Name</th>
+            <th scope="col">Status</th>
+            <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for video in videos %}
+            <tr class="clickable-row" data-href="/videos/{{ video.id }}">
+                <td>{{ video.filename }}</td>
+                <td>{{ video.status }}</td>
+                <td>{{ video.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

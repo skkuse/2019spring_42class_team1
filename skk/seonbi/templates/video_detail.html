@@ -1,38 +1,82 @@
 {% extends 'base.html' %}
 {% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'video_detail.css' %}">
 <script type="text/javascript">
 var refresh = function() {
-    $.get("/api/videos/{{video_id}}", function( data ) {
+    $.get("/api/videos/{{video_id}}", function (data) {
         var video = data.video;
         var detectedScenes = data.detected_scenes;
-        console.log(video, detectedScenes)
         if (!$("#video").attr('src')) {
             $("#video").attr("src", video.url)
+            $("#video").attr("style", "visibility:visible");
+        } else {
+            $("#video").attr("style", "visibility:hidden");
         }
-        $("#video_info").empty()
-        $("#video_info").append(`<div>${video.status}</div>`)
-        $("#detected_info").empty()
+        $("#scene-table-body").empty()
         for (i = 0; i < detectedScenes.length; i++) {
             var scene = detectedScenes[i]
-            $("#detected_info").append(`<div class="card" style="width: 18rem;"><img class="card-img-top"><div class="card-body"><h5 class="card-title">${scene.cause}</h5><p class="card-text">${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</p></div></div>`);
+            $("#scene-table-body").append(`<tr class="clickable-row"><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
         }
         if (video.status == "FAILED" || video.status == "DETECTED") {
             clearInterval(refreshInterval);
         }
     });
 }
-
-refresh();
 var refreshInterval = setInterval(function () {
     refresh();
 }, 5000);
+
+$(document).ready(function() {
+    refresh();
+    $("#btn-back").click(function () {
+        window.location = "/videos";
+    });
+
+    $("#btn-delete").click(function () {
+        $.ajax({
+            url: "/api/videos/{{video_id}}",
+            type: "DELETE",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+            },
+            success: function(result) {
+                window.location = "/videos";    
+            }
+        })
+    });
+
+    $(".clickable-row").click(function() {
+        console.log("click")
+    });
+});
 </script>
 {% endblock %}
 {% block content %}
-<video id="video" src="{{ video.url }}" autobuffer controls style="width: 480px; height: 270px;"></video>
-<div id="video_info">
-</div>
-<div id="detected_info">
+<div class="container">
+    <div id="menu-container">
+        <div id="button-groups">
+            <button id="btn-back" class="btn btn-primary">Back</button>
+            <button id="btn-delete" class="btn btn-danger">Delete</button>
+            <button id="btn-download" class="btn btn-success">Download</button>
+        </div>
+    </div>
+    <div id="video-container">
+        <div id="video-preview">
+            <video id="video" src="{{ video.url }}" autobuffer controls style="width: 480px; height: 270px;"></video>
+        </div>
+    </div>
+    <div id="scene-container">
+        <table class="table table-hover">
+            <thead>
+                <th scope="col">Section(Second)</th>
+                <th scope="col">Cause</th>
+                </tr>
+            </thead>
+            <tbody id="scene-table-body">
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 

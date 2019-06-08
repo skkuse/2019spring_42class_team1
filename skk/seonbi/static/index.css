@@ -10,3 +10,12 @@
     margin-top: 1rem;
     width: 50%;
 }
+
+#history-button-container {
+    text-align: center;
+}
+
+#history-button {
+    margin-top: 1rem;
+    width: 50%;
+}

@@ -8,6 +8,10 @@ $(document).ready(function () {
         var fileName = e.target.files[0].name;
         $(this).next('.custom-file-label').html(fileName);
     });
+
+    $("#btn-history").click(function () {
+        window.location = "/videos";
+    });
 });
 </script>
 {% endblock %}
@@ -39,6 +43,13 @@ $(document).ready(function () {
         </div>
         <div class="col-sm"></div>
     </div>
+    <div class="row">
+            <div class="col-sm"></div>
+            <div id="history-button-container" class="col-sm">
+                <button id="history-button" class="btn btn-success">History</button>
+            </div>
+            <div class="col-sm"></div>
+        </div>
     </form>
 </div>
 {% endblock %}

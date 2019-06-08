@@ -11,8 +11,6 @@ from seonbi.errors import SourceNotFound
 from nudenet import NudeClassifier
 
 bucket_name = 'seonbi'
-gcp_url_format = 'http://storage.googleapis.com/%s/%s'
-
 
 def upload_to_gcp(src_path, gcp_path):
     print('###### start upload from %s to %s' % (src_path, gcp_path))
@@ -21,8 +19,17 @@ def upload_to_gcp(src_path, gcp_path):
     blob = Blob(gcp_path, bucket)
     blob.upload_from_filename(src_path)
     blob.make_public()
-    print('##### upload success: ', gcp_url_format % (bucket_name, gcp_path))
-    return gcp_url_format % (bucket_name, gcp_path)
+    print('##### upload success: ', blob.public_url)
+    return blob.public_url
+
+
+def delete_gcp_file(url):
+    client = storage.Client.from_service_account_json(settings.GCP_KEY_PATH)
+    bucket = client.get_bucket(bucket_name)
+    path = url.replace('https://storage.googleapis.com/seonbi/', '')
+    path = path.replace('http://storage.googleapis.com/seonbi/', '')
+    blob = Blob(path, bucket)
+    blob.delete()
 
 
 def frame_order(str):
