@@ -30,6 +30,16 @@
 #video-preview {
     width: 100%;
     text-align: center;
+    position: relative;
+}
+
+#video-uploading {
+    position: absolute;
+    top:50%;
+    left:0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (max-width: 840px) {
@@ -48,10 +58,22 @@
     width: 100%;
     margin-top: 10px;
     margin-bottom: 10px;
+    position: relative;
+    text-align: center;
+}
+
+#scene-detecting {
+    position: absolute;
+    top: 200%;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (max-width: 840px) {
     #scene-container table {
+        text-align: left;
         width: 80%;
         margin: auto;
     }
@@ -59,6 +81,7 @@
 
 @media (min-width: 840px) {
     #scene-container table {
+        text-align: left;
         width: 840px;
         margin: auto;
     }
