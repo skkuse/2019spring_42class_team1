@@ -46,7 +46,7 @@ def detect(src_path, video):
     extract_frames(src_path, output_dir, frame_size, interval_millis)
 
     detected = list()
-    thresold = 5 * interval_millis
+    thresold = 3 * interval_millis
     for frame in sorted(os.listdir(output_dir), key=lambda f: frame_order(f)):
         order = frame_order(frame)
         if order < 0:
@@ -63,7 +63,7 @@ def detect(src_path, video):
                 detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=end_millis, cause=DetectedScene.DetectionCause.NUDITY))
             else:
                 latest = detected[-1]
-                if latest.end_millis + thresold < latest.start_millis:
+                if latest.end_millis + thresold <= start_millis:
                     detected.append(DetectedScene(src_video=video, start_millis=start_millis, end_millis=end_millis, cause=DetectedScene.DetectionCause.NUDITY))
                 else:
                     latest.end_millis = end_millis
@@ -93,10 +93,8 @@ def extract_frames(src_path, outdir_path, frame_size, interval_millis=1000):
         raise SourceNotFound
     src_name = str(uuid.uuid4()) + '_' + str(current_millis())
     cur_dir = os.path.dirname(src_path)
-    out_dir = os.path.join(outdir_path, os.path.splitext(src_name)[0])
-
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    if not os.path.exists(outdir_path):
+        os.makedirs(outdir_path)
 
     video = cv2.VideoCapture(src_path)
     print('###### start extracting frames: %s' % (src_path))
@@ -122,5 +120,5 @@ def extract_frames(src_path, outdir_path, frame_size, interval_millis=1000):
     video.release()
     cv2.destroyAllWindows()
     print('###### extracting frames')
-    print('###### from %s to %s complete.' % (src_path, out_dir))
+    print('###### from %s to %s complete.' % (src_path, outdir_path))
 

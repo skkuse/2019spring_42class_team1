@@ -1,0 +1,12 @@
+#file-input-container {
+    margin-top: 15rem;
+}
+
+#upload-button-container {
+    text-align: center;
+}
+
+#upload-button {
+    margin-top: 1rem;
+    width: 50%;
+}

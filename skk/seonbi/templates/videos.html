@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
 {% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'videos.css' %}">
 <script type="text/javascript">
-    
 </script>
 {% endblock %}
 {% block content %}
-{% for video in videos %}
-<div class="card" style="width: 18rem;">
-    <img class="card-img-top">
-    <div class="card-body">
-        <h5 class="card-title">{{ video.status }}</h5>
-        <p class="card-text">{{ video.filename }}</p>
-        <a href="/videos/{{ video.id }}" class="btn btn-primary">Go Detail</a>
+<div class="container">
+    {% for video in videos %}
+    <div class="row">
+        <div class="video-item">
+
+        </div>
+        <h5>{{ video.filename }}</h5>
+        <p>{{ video.status }}</p>
+        <p>{{ video.created_at }}</p>
     </div>
+    {% endfor %}
+    {% for video in videos %}
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top">
+        <div class="card-body">
+            <h5 class="card-title">{{ video.status }}</h5>
+            <p class="card-text">{{ video.filename }}</p>
+            <a href="/videos/{{ video.id }}" class="btn btn-primary">Go Detail</a>
+        </div>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}

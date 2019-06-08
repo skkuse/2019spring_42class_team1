@@ -1,14 +1,44 @@
 {% extends 'base.html' %}
 {% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'index.css' %}">
 <script type="text/javascript">
-    
+$(document).ready(function () {
+    $("#upload-file").on("change", function (e) {
+        var fileName = e.target.files[0].name;
+        $(this).next('.custom-file-label').html(fileName);
+    });
+});
 </script>
 {% endblock %}
 {% block content %}
-<form method="post" enctype="multipart/form-data">
+<div id="file-input-container" class="container">
+    <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <input type="file" name="file">
-    <button type="submit">Upload</button>
-</form>
-<script src="" async defer></script>
+    <div class="row">
+        <div class="col-sm"></div>
+        <div class="col-sm">
+            
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm"></div>
+        <div class="col-sm container">
+            <div class="custom-file">
+                <input class="custom-file-input" type="file" name="file" id="upload-file">
+                <label class="custom-file-label" for="upload-file" aria-describedby="upload-button">Choose file</label>
+            </div>
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm"></div>
+        <div id="upload-button-container" class="col-sm">
+            <button id="upload-button" class="btn btn-primary">Upload</button>
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    </form>
+</div>
 {% endblock %}
