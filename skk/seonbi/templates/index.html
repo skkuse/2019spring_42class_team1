@@ -9,6 +9,10 @@
     {% csrf_token %}
     <input type="file" name="file">
     <button type="submit">Upload</button>
+    
+    <a href="{% url 'test' %}">테스트 페이지</a>
+    <a href="{% url 'signin' %}">로그인 페이지</a>
+    <a href="{% url 'signup' %}">회원가입 페이지</a>
 </form>
 <script src="" async defer></script>
 {% endblock %}

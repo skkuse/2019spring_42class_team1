@@ -19,10 +19,16 @@ from django.conf.urls.static import static
 from django.urls import include, path
 from seonbi import views
 
+from django.contrib.auth.views import LogoutView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('seonbi.api.urls')),
     path('', views.index, name='index'),
     path('videos/', include('seonbi.videos.urls')),
+    path('signup/', views.signup, name='signup'),
+    path('signin/', views.signin, name='signin'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('test/', views.test, name='test')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
