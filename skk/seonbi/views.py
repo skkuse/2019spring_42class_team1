@@ -11,6 +11,7 @@ from seonbi.utils import current_millis
 from seonbi.models import Video
 from seonbi.tasks import upload_and_detect
 
+
 def index(request):
     if request.method == 'POST':
         uploaded = request.FILES.get('file')
@@ -18,12 +19,15 @@ def index(request):
             ext = os.path.splitext(uploaded.name)[1]
             name = str(uuid.uuid4()) + '_' + str(current_millis())
             filename = name + ext
-            filepath = default_storage.save(os.path.join(settings.MEDIA_ROOT, filename), request.FILES['file'])
-            video = Video(status=Video.Status.UPLOADING, filename=uploaded.name)
+            filepath = default_storage.save(os.path.join(
+                settings.MEDIA_ROOT, filename), request.FILES['file'])
+            video = Video(status=Video.Status.UPLOADING,
+                          filename=uploaded.name)
             video.save()
 
             now = datetime.datetime.now()
-            gcp_path = os.path.join('%d-%d-%d' % (now.year, now.month, now.day), filename)
+            gcp_path = os.path.join('%d-%d-%d' %
+                                    (now.year, now.month, now.day), filename)
             upload_and_detect.delay(video.id, filepath, gcp_path)
         return HttpResponseRedirect('/videos')
     return render(request, 'index.html', {})

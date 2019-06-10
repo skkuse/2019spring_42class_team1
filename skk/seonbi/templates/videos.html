@@ -3,15 +3,15 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'videos.css' %}">
 <script type="text/javascript">
-$(document).ready(function() {
-    $("#btn-upload").click(function () {
-        window.location = "/";
-    })
+    $(document).ready(function () {
+        $("#btn-upload").click(function () {
+            window.location = "/";
+        })
 
-    $(".clickable-row").click(function () {
-        window.location = $(this).data("href");
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
     });
-});
 </script>
 {% endblock %}
 {% block content %}

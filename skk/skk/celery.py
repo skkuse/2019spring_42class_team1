@@ -4,8 +4,8 @@ from django.conf import settings
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'skk.settings')
 app = Celery('skk')
-  
-app.config_from_object('django.conf:settings') 
+
+app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.update(
     BROKER_URL=settings.CELERY_BROKER_URL,

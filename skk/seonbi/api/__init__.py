@@ -24,7 +24,7 @@ def filter_detail(request, video_id, filter_id):
 
 
 def get_video_detail(request, video_id):
-    video = Video.objects.get(id = video_id)
+    video = Video.objects.get(id=video_id)
     detected_scenes = DetectedScene.objects.filter(src_video=video).values()
     filtered_results = FilteredResult.objects.filter(src_video=video).values()
     return JsonResponse({
@@ -65,7 +65,8 @@ def delete_filter(request, video_id, filter_id):
 
 def filter_video(request, video_id, scene_ids):
     video = Video.objects.get(id=video_id)
-    fr = FilteredResult(status=FilteredResult.Status.FILTERING, src_video=video)
+    fr = FilteredResult(
+        status=FilteredResult.Status.FILTERING, src_video=video)
     fr.save()
     task.filter_and_upload.delay(fr.id, [], removal=False)
     return JsonResponse({

@@ -3,59 +3,59 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'filter_video.css' %}">
 <script type="text/javascript">
-var refresh = function() {
-    $.get("/api/videos/{{video_id}}/filter/{{filter_id}}", function (data) {
-        console.log(data)
-        if (data.status == "FILTERING") {
-            $("#video").attr("style", "visibility:hidden");
-            $("#video-filtering").attr("style", "display: block");
-            $("#video-uploading").attr("style", "display: none");
-        } else if (data.status == "UPLOADING") {
-            $("#video").attr("style", "visibility:hidden");
-            $("#video-filtering").attr("style", "display: none");
-            $("#video-uploading").attr("style", "display: block");
-        } else if (data.status == "COMPLETE") {
-            $("#video").attr("src", data.url)
-            $("#video").attr("style", "visibility:visible");
-            $("#video-filtering").attr("style", "display: none");
-            $("#video-uploading").attr("style", "display: none");
-        }
-        if (data.status == "FAILED" || data.status == "DETECTED") {
-            clearInterval(refreshInterval);
-        }
-    });
-}
-var refreshInterval = setInterval(function () {
-    refresh();
-}, 5000);
-
-$(document).ready(function() {
-    refresh();
-    $("#btn-back").click(function () {
-        window.location = "/videos/{{video_id}}";
-    });
-
-    $("#btn-delete").click(function () {
-        $.ajax({
-            url: "/api/videos/{{video_id}}/filter/{{filter_id}}",
-            type: "DELETE",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
-            },
-            success: function(result) {
-                window.location = "/videos/{{video_id}}";
+    var refresh = function () {
+        $.get("/api/videos/{{video_id}}/filter/{{filter_id}}", function (data) {
+            console.log(data)
+            if (data.status == "FILTERING") {
+                $("#video").attr("style", "visibility:hidden");
+                $("#video-filtering").attr("style", "display: block");
+                $("#video-uploading").attr("style", "display: none");
+            } else if (data.status == "UPLOADING") {
+                $("#video").attr("style", "visibility:hidden");
+                $("#video-filtering").attr("style", "display: none");
+                $("#video-uploading").attr("style", "display: block");
+            } else if (data.status == "COMPLETE") {
+                $("#video").attr("src", data.url)
+                $("#video").attr("style", "visibility:visible");
+                $("#video-filtering").attr("style", "display: none");
+                $("#video-uploading").attr("style", "display: none");
             }
-        })
-    });
-    
+            if (data.status == "FAILED" || data.status == "DETECTED") {
+                clearInterval(refreshInterval);
+            }
+        });
+    }
+    var refreshInterval = setInterval(function () {
+        refresh();
+    }, 5000);
 
-    $("#btn-download").click(function () {
-        var url = $("#video").attr("src");
-        if (url) {
-            window.open(url)
-        }
+    $(document).ready(function () {
+        refresh();
+        $("#btn-back").click(function () {
+            window.location = "/videos/{{video_id}}";
+        });
+
+        $("#btn-delete").click(function () {
+            $.ajax({
+                url: "/api/videos/{{video_id}}/filter/{{filter_id}}",
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                },
+                success: function (result) {
+                    window.location = "/videos/{{video_id}}";
+                }
+            })
+        });
+
+
+        $("#btn-download").click(function () {
+            var url = $("#video").attr("src");
+            if (url) {
+                window.open(url)
+            }
+        });
     });
-});
 </script>
 {% endblock %}
 {% block content %}

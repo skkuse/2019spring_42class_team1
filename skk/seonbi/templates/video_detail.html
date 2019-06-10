@@ -3,88 +3,88 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'video_detail.css' %}">
 <script type="text/javascript">
-var refresh = function() {
-    $.get("/api/videos/{{video_id}}", function (data) {
-        var video = data.video;
-        var detectedScenes = data.detected_scenes;
-        var filteredResults = data.filtered_results;
-        if (!$("#video").attr("src") && video.url) {
-            $("#video").attr("src", video.url);
-        }
-        $("#scene-table-body").empty()
-        for (i = 0; i < detectedScenes.length; i++) {
-            var scene = detectedScenes[i];
-            $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
-        }
-
-        if (filteredResults.length == 0) {
-            $("#filtered-container").attr("style", "display: hidden");
-        } else {
-            $("#filtered-container").attr("style", "display: block");
-        }
-        $("#filtered-table-body").empty()
-        for (i = 0; i < filteredResults.length; i++) {
-            var filteredResult = filteredResults[i];
-            $("#filtered-table-body").append(`<tr class="clickable-row" data-id=${filteredResult.id}><td>${filteredResult.created_at}</td><td>${filteredResult.status}</td></tr>`);
-        }
-
-        if (video.status == "UPLOADING") {
-            $("#video").attr("style", "visibility:hidden");
-            $("#video-uploading").attr("style", "display: block");
-        } else {
-            $("#video").attr("style", "visibility:visible");
-            $("#video-uploading").attr("style", "display: none");
-        }
-        if (video.status == "UPLOADED" || video.status == "DETECTING") {
-            $("#scene-detecting").attr("style", "display: block");
-        } else {
-            $("#scene-detecting").attr("style", "display: none");
-        }
-        if (video.status == "FAILED" || video.status == "DETECTED") {
-            clearInterval(refreshInterval);
-        }
-    });
-}
-var refreshInterval = setInterval(function () {
-    refresh();
-}, 5000);
-
-$(document).ready(function() {
-    refresh();
-    $("#btn-back").click(function () {
-        window.location = "/videos";
-    });
-
-    $("#btn-delete").click(function () {
-        $.ajax({
-            url: "/api/videos/{{video_id}}",
-            type: "DELETE",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
-            },
-            success: function(result) {
-                window.location = "/videos";
+    var refresh = function () {
+        $.get("/api/videos/{{video_id}}", function (data) {
+            var video = data.video;
+            var detectedScenes = data.detected_scenes;
+            var filteredResults = data.filtered_results;
+            if (!$("#video").attr("src") && video.url) {
+                $("#video").attr("src", video.url);
             }
-        })
-    });
-
-    $("#btn-download").click(function () {
-        $.post({
-            url: "/api/videos/{{video_id}}/",
-            data: { "scene_ids": [] },
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            success: function (result) {
-                window.location = "/videos/{{video_id}}/filter/" + result.id;    
+            $("#scene-table-body").empty()
+            for (i = 0; i < detectedScenes.length; i++) {
+                var scene = detectedScenes[i];
+                $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
             }
-        })
-    });
 
-    $(".clickable-row").click(function() {
-        console.log("click")
+            if (filteredResults.length == 0) {
+                $("#filtered-container").attr("style", "display: hidden");
+            } else {
+                $("#filtered-container").attr("style", "display: block");
+            }
+            $("#filtered-table-body").empty()
+            for (i = 0; i < filteredResults.length; i++) {
+                var filteredResult = filteredResults[i];
+                $("#filtered-table-body").append(`<tr class="clickable-row" data-id=${filteredResult.id}><td>${filteredResult.created_at}</td><td>${filteredResult.status}</td></tr>`);
+            }
+
+            if (video.status == "UPLOADING") {
+                $("#video").attr("style", "visibility:hidden");
+                $("#video-uploading").attr("style", "display: block");
+            } else {
+                $("#video").attr("style", "visibility:visible");
+                $("#video-uploading").attr("style", "display: none");
+            }
+            if (video.status == "UPLOADED" || video.status == "DETECTING") {
+                $("#scene-detecting").attr("style", "display: block");
+            } else {
+                $("#scene-detecting").attr("style", "display: none");
+            }
+            if (video.status == "FAILED" || video.status == "DETECTED") {
+                clearInterval(refreshInterval);
+            }
+        });
+    }
+    var refreshInterval = setInterval(function () {
+        refresh();
+    }, 5000);
+
+    $(document).ready(function () {
+        refresh();
+        $("#btn-back").click(function () {
+            window.location = "/videos";
+        });
+
+        $("#btn-delete").click(function () {
+            $.ajax({
+                url: "/api/videos/{{video_id}}",
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                },
+                success: function (result) {
+                    window.location = "/videos";
+                }
+            })
+        });
+
+        $("#btn-download").click(function () {
+            $.post({
+                url: "/api/videos/{{video_id}}/",
+                data: { "scene_ids": [] },
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                success: function (result) {
+                    window.location = "/videos/{{video_id}}/filter/" + result.id;
+                }
+            })
+        });
+
+        $(".clickable-row").click(function () {
+            console.log("click")
+        });
     });
-});
 </script>
 {% endblock %}
 {% block content %}
@@ -127,4 +127,3 @@ $(document).ready(function() {
     </div>
 </div>
 {% endblock %}
-

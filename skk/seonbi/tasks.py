@@ -33,11 +33,12 @@ def filter_and_upload(fr_id, scenes, removal=False):
     scenes = DetectedScene.objects.filter(src_video=fr.src_video).values()
     try:
         filtered_path = filter(fr, scenes, removal)
-        
+
         fr.status = FilteredResult.Status.UPLOADING
         fr.save()
         now = datetime.datetime.now()
-        gcp_path = os.path.join('%d-%d-%d' % (now.year, now.month, now.day), os.path.basename(filtered_path))
+        gcp_path = os.path.join(
+            '%d-%d-%d' % (now.year, now.month, now.day), os.path.basename(filtered_path))
         url = upload_to_gcp(filtered_path, gcp_path)
         # os.remove(filtered_path)
 
