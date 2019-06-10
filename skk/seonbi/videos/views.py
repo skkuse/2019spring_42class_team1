@@ -12,4 +12,4 @@ def detail(request, video_id):
 
 
 def filter(request, video_id, filter_id):
-    return render(request, 'filter_video.html', {'video_id': video_id})
+    return render(request, 'filter_video.html', {'video_id': video_id, 'filter_id': filter_id })

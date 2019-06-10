@@ -1,8 +1,9 @@
-import os
-import uuid
-import ffmpeg
 import cv2
+import ffmpeg
+import numpy as np
+import os
 import shutil
+import uuid
 from django.conf import settings
 from google.cloud import storage
 from google.cloud.storage import Blob
@@ -10,8 +11,66 @@ from seonbi.utils import current_millis
 from seonbi.models import Video, DetectedScene
 from seonbi.errors import SourceNotFound
 from nudenet import NudeClassifier, NudeDetector
+from PIL import Image
 
-bucket_name = 'seonbi'
+
+class BlurPointSet:
+    def __init__(self):
+        self.pool = dict()
+    
+    def make_key(self, bp):
+        return '%d:%d:%d:%d' % (bp.x, bp.y, bp.width, bp.height)
+    
+    def parse_key(self, key):
+        x, y, width, height =  key.split(':')
+        return x, y , width, height
+
+    def add_censors(self, censors, start_millis, end_millis):
+        for censor in censors:
+            if not censor['label'] in ['F_BREAST', 'F_GENITALIA', 'M_GENETALIA']:
+                continue
+            blurbox = censor['box']
+            self.add_bp(BlurPoint(x=blurbox[0], y=blurbox[1], width=blurbox[2] - blurbox[0], height=blurbox[3] - blurbox[1], start_millis=start_millis, end_millis=end_millis))
+    
+    def add_bp(self, bp):
+        key = self.make_key(bp)
+        if not self.pool.get(key) is None:
+            self.pool[key].append(bp)
+        else:
+            self.pool[key] = [bp]
+    
+    def list_for_overlay(self):
+        overlays = list()
+        for key in self.pool.keys():
+            overlay = dict()
+            values = self.pool[key]
+            for (idx, value) in enumerate(values):
+                overlay['x'] = value.x
+                overlay['y'] = value.y
+                overlay['width'] = value.width
+                overlay['height'] = value.height
+                if idx == 0:
+                    overlay['enable'] = 'between(t, %f, %f)' % (value.start_millis / 1000, value.end_millis / 1000)
+                else:
+                    overlay['enable'] += '+between(t, %f, %f)' % (value.start_millis / 1000, value.end_millis / 1000)
+            overlays.append(overlay)
+        return overlays
+
+
+class BlurPoint:
+    def __init__(self, x, y, width, height, start_millis, end_millis):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.start_millis = start_millis
+        self.end_millis = end_millis
+
+
+def read_image_rgb(path):
+    image = np.asarray(Image.open(path).convert('RGB'))
+    return image[:, :, ::-1].copy()
+
 
 def gcp_path(url):
     return url.replace('https://storage.googleapis.com/seonbi/', '').replace('http://storage.googleapis.com/seonbi/', '')
@@ -20,7 +79,7 @@ def gcp_path(url):
 def upload_to_gcp(src_path, gcp_path):
     print('###### start upload from %s to %s' % (src_path, gcp_path))
     client = storage.Client.from_service_account_json(settings.GCP_KEY_PATH)
-    bucket = client.get_bucket(bucket_name)
+    bucket = client.get_bucket(settings.BUCKET_NAME)
     blob = Blob(gcp_path, bucket)
     blob.upload_from_filename(src_path)
     blob.make_public()
@@ -29,12 +88,12 @@ def upload_to_gcp(src_path, gcp_path):
 
 
 def delete_gcp_file(url):
-    print('###### start removing %' % url)
+    print('###### start removing %s' % url)
     client = storage.Client.from_service_account_json(settings.GCP_KEY_PATH)
-    bucket = client.get_bucket(bucket_name)
+    bucket = client.get_bucket(settings.BUCKET_NAME)
     blob = Blob(gcp_path(url), bucket)
     blob.delete()
-    print('###### removing success %' % url)
+    print('###### removing success %s' % url)
 
 
 def frame_order(str):
@@ -99,7 +158,7 @@ def filter(fr, scenes, removal):
     src_path = os.path.join(settings.MEDIA_ROOT, src_name + fileext)
     print('##### start download  %s' % src_path)
     client = storage.Client.from_service_account_json(settings.GCP_KEY_PATH)
-    bucket = client.get_bucket(bucket_name)
+    bucket = client.get_bucket(settings.BUCKET_NAME)
     blob = Blob(gcp_path(video.url), bucket)
     blob.download_to_filename(src_path)
     print('##### complete download %s' % src_path)
@@ -144,26 +203,26 @@ def filter(fr, scenes, removal):
                         break
             print('##### complete extracting frames for detecting blurbox')
             print('##### start detecting blurbox %s' % frames_dir)
-            blur_op = infile
+            bps = BlurPointSet()
             for frame in sorted(os.listdir(frames_dir), key=lambda f: int(os.path.splitext(f)[0])):
                 censors = detector.detect(os.path.join(frames_dir, frame))
                 print('detected blur box point %d from %s' % (len(censors), frame))
                 start_millis = int(os.path.splitext(frame)[0])
-                for censor in censors:
-                    if not censor['label'] is 'F_BREAST':
-                        continue
-                    blurbox = censor['box']
-                    blur_op = blur_op.overlay(
-                        infile.crop(x=blurbox[0], y=blurbox[1], width=blurbox[2] - blurbox[0], height=blurbox[3] - blurbox[1]).filter_('boxblur', luma_radius=10, luma_power=10),
-                        x=blurbox[0],
-                        y=blurbox[1],
-                        enable='between(t, %f, %f)' % (start_millis / 1000, (start_millis + interval) / 1000)
-                    )
+                end_millis = start_millis + interval
+                bps.add_censors(censors, start_millis, end_millis)
             print('##### complete detecting blurbox')
+
+            print('##### start blur')
+            blur_op = infile
+            for overlay in bps.list_for_overlay():
+                blur_op = blur_op.overlay(
+                    infile.crop(x=overlay['x'], y=overlay['y'], width=overlay['width'], height=overlay['height']).filter_('boxblur', luma_radius=10, luma_power=10),
+                    x=overlay['x'], y=overlay['y'], enable=overlay['enable']
+                )
             video.release()
             cv2.destroyAllWindows()
-
             blur_op.output(out_path).run(overwrite_output=True)
+            print('##### complete blur')
             shutil.rmtree(frames_dir)
             os.remove(src_path)
         except Exception as e:

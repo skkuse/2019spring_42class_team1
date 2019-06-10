@@ -1,22 +1,25 @@
+import seonbi.tasks as task
 from django.http import JsonResponse
 from seonbi.models import Video, DetectedScene, FilteredResult
-from seonbi.tasks import delete_video, filter_and_upload
+
 
 def video_detail(request, video_id):
     if request.method == 'DELETE':
-        return delete(request, video_id)
+        return delete_video(request, video_id)
     if request.method == 'POST':
-        return filter(request, video_id, request.POST.get("scene_ids", list()))
+        return filter_video(request, video_id, request.POST.get("scene_ids", list()))
     return get_video_detail(request, video_id)
 
 
 def filter_detail(request, video_id, filter_id):
+    if request.method == 'DELETE':
+        return delete_filter(request, video_id, filter_id)
     result = FilteredResult.objects.get(id=filter_id)
     return JsonResponse({
         'id': result.id,
         'status': result.status,
-        'url': url,
-        'created_at': created_at
+        'url': result.url,
+        'created_at': result.created_at
     })
 
 
@@ -36,21 +39,31 @@ def get_video_detail(request, video_id):
     })
 
 
-def delete(request, video_id):
-    video = Video.objects.get(id = video_id)
+def delete_video(request, video_id):
+    video = Video.objects.get(id=video_id)
     try:
-        delete_video.delay(video.url)
+        task.delete_video.delay(video.url)
     except:
-        print('failed')
+        print('deleting video in gcp failed')
     video.delete()
     return JsonResponse({})
 
 
-def filter(request, video_id, scene_ids):
+def delete_filter(request, video_id, filter_id):
+    fr = FilteredResult.objects.get(id=filter_id)
+    try:
+        task.delete_video.delay(fr.url)
+    except:
+        print('deleting video in gcp failed')
+    fr.delete()
+    return JsonResponse({})
+
+
+def filter_video(request, video_id, scene_ids):
     video = Video.objects.get(id=video_id)
     fr = FilteredResult(status=FilteredResult.Status.FILTERING, src_video=video)
     fr.save()
-    filter_and_upload.delay(fr.id, [], removal=False)
+    task.filter_and_upload.delay(fr.id, [], removal=False)
     return JsonResponse({
         'id': fr.id,
         'status': fr.status
