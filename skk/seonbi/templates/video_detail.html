@@ -10,27 +10,23 @@ var refresh = function() {
         if (!$("#video").attr("src") && video.url) {
             $("#video").attr("src", video.url)
         }
-
-        if ($("#video").attr("src")) {
-            $("#video").attr("style", "visibility:visible");
-        } else {
-            $("#video").attr("style", "visibility:hidden");
-        }
         $("#scene-table-body").empty()
         for (i = 0; i < detectedScenes.length; i++) {
             var scene = detectedScenes[i]
-            $("#scene-table-body").append(`<tr class="clickable-row"><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
+            $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
         }
 
         if (video.status == "UPLOADING") {
-            $("#video-uploading").attr("style", "visibility: visible");
+            $("#video").attr("style", "visibility:hidden");
+            $("#video-uploading").attr("style", "display: block");
         } else {
-            $("#video-uploading").attr("style", "visibility: hidden");
+            $("#video").attr("style", "visibility:visible");
+            $("#video-uploading").attr("style", "display: none");
         }
-        if (video.status == "DETECTING") {
-            $("#scene-detecting").attr("style", "visibility: visible");
+        if (video.status == "UPLOADED" || video.status == "DETECTING") {
+            $("#scene-detecting").attr("style", "display: block");
         } else {
-            $("#scene-detecting").attr("style", "visibility: hidden");
+            $("#scene-detecting").attr("style", "display: none");
         }
         if (video.status == "FAILED" || video.status == "DETECTED") {
             clearInterval(refreshInterval);
@@ -55,7 +51,20 @@ $(document).ready(function() {
                 xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
             },
             success: function(result) {
-                window.location = "/videos";    
+                window.location = "/videos";
+            }
+        })
+    });
+
+    $("#btn-download").click(function () {
+        $.post({
+            url: "/api/videos/{{video_id}}/",
+            data: { "scene_ids": [] },
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            success: function (result) {
+                window.location = "/videos/{{video_id}}/filter/" + result.id;    
             }
         })
     });
@@ -78,7 +87,7 @@ $(document).ready(function() {
     <div id="video-container">
         <div id="video-preview">
             <div id="video-uploading">동영상 업로드 중입니다.</div>
-            <video id="video" src="{{ video.url }}" autobuffer controls style="width: 480px; height: 270px;"></video>
+            <video id="video" src="{{ video.url }}" autobuffer controls></video>
         </div>
     </div>
     <div id="scene-container">
