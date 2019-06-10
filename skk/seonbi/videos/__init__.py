@@ -168,20 +168,41 @@ def filter(fr, scenes, removal):
     blob.download_to_filename(src_path)
     print('##### complete download %s' % src_path)
 
+    video = cv2.VideoCapture(src_path)
+    fps = video.get(cv2.CAP_PROP_FPS)
+    num_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+    duration = int((num_frames / fps) * 1000)
+    
     out_name = str(uuid.uuid4()) + '_' + str(current_millis())
     out_path = os.path.join(settings.MEDIA_ROOT, out_name + fileext)
     infile = ffmpeg.input(src_path)
     if removal:
-        print('##### start removing scenes')
-        remove_op = []
-        for scene in scenes:
-            remove_op.append(
-                infile.trim(start=scene['start_millis'] / 1000,
-                            end=scene['end_millis']).setpts('N/FR/TB')
-            )
-        if len(remove_op) > 0:
-            ffmpeg.concat(remove_op).output(
-                src_path).run(overwrite_output=True)
+        print('##### start removing %d scenes' % len(scenes))
+        start_times = sorted([scene['start_millis'] / 1000 for scene in scenes])
+        end_times = sorted([scene['end_millis'] / 1000 for scene in scenes])
+        times_length = len(start_times)
+        times = []
+        print(start_times, end_times)
+        for idx in range(times_length):
+            print(start_times[idx], end_times[idx])
+            if idx == 0:
+                if start_times[idx] != 0:
+                    times.append((0, start_times[idx]))
+            if idx == times_length - 1:
+                times.append((end_times[idx], None))
+            if 0 < idx and times_length > 1:
+                times.append((end_times[idx - 1], start_times[idx]))
+        trims = []
+        print(times)
+        for time in times:
+            start = time[0]
+            end = time[1]
+            if end is None:
+                trims.append(infile.trim(start=start).setpts('N/FR/TB'))
+            else:
+                trims.append(infile.trim(start=start, end=end).setpts('N/FR/TB'))
+        print(trims)
+        ffmpeg.concat(*trims).output(out_path).run(overwrite_output=True)
     else:
         # extract frames for detecting
         print('##### start extracting frames for detecting blurbox')
@@ -190,10 +211,6 @@ def filter(fr, scenes, removal):
         if not os.path.exists(frames_dir):
             os.makedirs(frames_dir)
         try:
-            video = cv2.VideoCapture(src_path)
-            fps = video.get(cv2.CAP_PROP_FPS)
-            num_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
-            duration = int((num_frames / fps) * 1000)
             interval = 250
             for scene in scenes:
                 cur_millis = scene['start_millis']
@@ -229,8 +246,6 @@ def filter(fr, scenes, removal):
                         'boxblur', luma_radius=10, luma_power=10),
                     x=overlay['x'], y=overlay['y'], enable=overlay['enable']
                 )
-            video.release()
-            cv2.destroyAllWindows()
             blur_op.output(out_path).run(overwrite_output=True)
             print('##### complete blur')
             shutil.rmtree(frames_dir)
@@ -240,6 +255,8 @@ def filter(fr, scenes, removal):
             os.remove(src_path)
             shutil.rmtree(frames_dir)
             raise e
+    video.release()
+    cv2.destroyAllWindows()
     return out_path
 
 

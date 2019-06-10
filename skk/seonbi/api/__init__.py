@@ -7,7 +7,7 @@ def video_detail(request, video_id):
     if request.method == 'DELETE':
         return delete_video(request, video_id)
     if request.method == 'POST':
-        return filter_video(request, video_id, request.POST.get("scene_ids", list()))
+        return filter_video(request, video_id, request.POST.getlist('scene_ids', list()), request.POST.get('removal', False))
     return get_video_detail(request, video_id)
 
 
@@ -63,12 +63,12 @@ def delete_filter(request, video_id, filter_id):
     return JsonResponse({})
 
 
-def filter_video(request, video_id, scene_ids):
+def filter_video(request, video_id, scene_ids, removal):
     video = Video.objects.get(id=video_id)
     fr = FilteredResult(
         status=FilteredResult.Status.FILTERING, src_video=video)
     fr.save()
-    task.filter_and_upload.delay(fr.id, [], removal=False)
+    task.filter_and_upload.delay(fr.id, scene_ids, removal)
     return JsonResponse({
         'id': fr.id,
         'status': fr.status

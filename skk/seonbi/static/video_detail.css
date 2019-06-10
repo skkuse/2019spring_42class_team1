@@ -114,3 +114,7 @@
 .clickable-row:hover {
     cursor: pointer;
 }
+
+.scene-selector-item {
+    margin: 10px;
+}

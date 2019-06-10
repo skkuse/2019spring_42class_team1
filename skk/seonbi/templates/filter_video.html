@@ -20,7 +20,7 @@
                 $("#video-filtering").attr("style", "display: none");
                 $("#video-uploading").attr("style", "display: none");
             }
-            if (data.status == "FAILED" || data.status == "DETECTED") {
+            if (data.status == "FAILED" || data.status == "COMPLETE") {
                 clearInterval(refreshInterval);
             }
         });

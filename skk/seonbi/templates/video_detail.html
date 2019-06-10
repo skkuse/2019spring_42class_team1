@@ -14,7 +14,8 @@
             $("#scene-table-body").empty()
             for (i = 0; i < detectedScenes.length; i++) {
                 var scene = detectedScenes[i];
-                $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
+                $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} - ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
+                $("#sceneIdSelectorBody").append(`<div class="custom-control custom-checkbox scene-selector-item"><input type="checkbox" class="custom-control-input" id=${scene.id}><label class="custom-control-label" for=${scene.id}>${scene.start_millis / 1000} - ${scene.end_millis / 1000} : ${scene.cause}</label></div>`)
             }
 
             if (filteredResults.length == 0) {
@@ -68,10 +69,42 @@
             })
         });
 
-        $("#btn-download").click(function () {
+        $("#make-blur").click(function () {
+            var checkedList = new Array();
+            $(".scene-selector-item input").each(function (idx, e) {
+                var checkbox = $(e);
+                if ($(e).is(":checked")) {
+                    checkedList.push(Number(checkbox.attr("id")));
+                }
+            });
+            
             $.post({
                 url: "/api/videos/{{video_id}}/",
-                data: { "scene_ids": [] },
+                dataType: "json",
+                traditional: true,
+                data: { scene_ids: checkedList, removal: false },
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                success: function (result) {
+                    window.location = "/videos/{{video_id}}/filter/" + result.id;
+                }
+            })
+        });
+
+        $("#make-remove").click(function () {var checkedList = [];
+            var checkedList = new Array();
+            $(".scene-selector-item input").each(function (idx, e) {
+                var checkbox = $(e);
+                if ($(e).is(":checked")) {
+                    checkedList.push(Number(checkbox.attr("id")));
+                }
+            });
+            $.post({
+                url: "/api/videos/{{video_id}}/",
+                dataType: "json",
+                traditional: true,
+                data: { scene_ids: checkedList, removal: true },
                 headers: {
                     "X-CSRFToken": "{{ csrf_token }}"
                 },
@@ -93,7 +126,8 @@
         <div id="button-groups">
             <button id="btn-back" class="btn btn-primary">Back</button>
             <button id="btn-delete" class="btn btn-danger">Delete</button>
-            <button id="btn-download" class="btn btn-success">Download</button>
+            <button id="btn-download" class="btn btn-success" data-toggle="modal"
+                data-target="#sceneIdSelector">Download</button>
         </div>
     </div>
     <div id="video-container">
@@ -124,6 +158,26 @@
             <tbody id="scene-table-body">
             </tbody>
         </table>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="sceneIdSelector" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sceneIdSelectorTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="sceneIdSelectorBody">
+            </div>
+            <div class="modal-footer">
+                <button id="make-blur" type="button" class="btn btn-secondary">Make Blurred Video</button>
+                <button id="make-remove" type="button" class="btn btn-secondary">Make Removed Video</button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

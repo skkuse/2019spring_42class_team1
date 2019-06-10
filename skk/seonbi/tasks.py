@@ -28,9 +28,9 @@ def delete_video(url):
 
 
 @app.task(name='filter_and_upload')
-def filter_and_upload(fr_id, scenes, removal=False):
+def filter_and_upload(fr_id, scene_ids, removal=False):
     fr = FilteredResult.objects.get(id=fr_id)
-    scenes = DetectedScene.objects.filter(src_video=fr.src_video).values()
+    scenes = DetectedScene.objects.filter(id__in=scene_ids).values()
     try:
         filtered_path = filter(fr, scenes, removal)
 
@@ -40,7 +40,7 @@ def filter_and_upload(fr_id, scenes, removal=False):
         gcp_path = os.path.join(
             '%d-%d-%d' % (now.year, now.month, now.day), os.path.basename(filtered_path))
         url = upload_to_gcp(filtered_path, gcp_path)
-        # os.remove(filtered_path)
+        os.remove(filtered_path)
 
         fr.url = url
         fr.status = FilteredResult.Status.COMPLETE
