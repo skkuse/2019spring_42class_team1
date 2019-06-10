@@ -141,10 +141,10 @@ def filter(fr, scenes, removal):
                         break
                     cur_millis += interval
                     if cur_millis >= scene['end_millis'] or cur_millis > duration:
-                        print(cur_millis, scene['end_millis'], duration)
                         break
             print('##### complete extracting frames for detecting blurbox')
             print('##### start detecting blurbox %s' % frames_dir)
+            blur_op = infile
             for frame in sorted(os.listdir(frames_dir), key=lambda f: int(os.path.splitext(f)[0])):
                 censors = detector.detect(os.path.join(frames_dir, frame))
                 print('detected blur box point %d from %s' % (len(censors), frame))
@@ -153,24 +153,24 @@ def filter(fr, scenes, removal):
                     if not censor['label'] is 'F_BREAST':
                         continue
                     blurbox = censor['box']
-                    infile.overlay(
+                    blur_op = blur_op.overlay(
                         infile.crop(x=blurbox[0], y=blurbox[1], width=blurbox[2] - blurbox[0], height=blurbox[3] - blurbox[1]).filter_('boxblur', luma_radius=10, luma_power=10),
                         x=blurbox[0],
                         y=blurbox[1],
-                        enable='between(t, %d, %d)' % (start_millis / 1000, start_millis + interval / 1000)
+                        enable='between(t, %f, %f)' % (start_millis / 1000, (start_millis + interval) / 1000)
                     )
             print('##### complete detecting blurbox')
             video.release()
             cv2.destroyAllWindows()
-            infile.output(out_path).run(overwrite_output=True)
-            os.remove(src_path)
+
+            blur_op.output(out_path).run(overwrite_output=True)
             shutil.rmtree(frames_dir)
+            os.remove(src_path)
         except Exception as e:
             print('##### detect and blur failed %s', str(e))
             os.remove(src_path)
             shutil.rmtree(frames_dir)
             raise e
-            
     return out_path
 
 
