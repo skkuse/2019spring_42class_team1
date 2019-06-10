@@ -25,7 +25,8 @@ def filter_detail(request, video_id, filter_id):
 
 def get_video_detail(request, video_id):
     video = Video.objects.get(id = video_id)
-    detected_scenes = DetectedScene.objects.filter(src_video = video).values()
+    detected_scenes = DetectedScene.objects.filter(src_video=video).values()
+    filtered_results = FilteredResult.objects.filter(src_video=video).values()
     return JsonResponse({
         'video': {
             'status': video.status,
@@ -33,6 +34,9 @@ def get_video_detail(request, video_id):
             'url': video.url,
             'created_at': video.created_at
         },
+        'filtered_results': [
+            {'id': fr['id'], 'status': fr['status'], 'url': fr['url'], 'created_at': fr['created_at']} for fr in filtered_results
+        ],
         'detected_scenes': [
             {'id': scene['id'], 'start_millis': scene['start_millis'], 'end_millis': scene['end_millis'], 'cause': scene['cause']} for scene in detected_scenes
         ]

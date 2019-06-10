@@ -54,9 +54,33 @@
     }
 }
 
+#filtered-container {
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    position: relative;
+    text-align: center;
+}
+
+@media (max-width: 840px) {
+    #filtered-container table {
+        text-align: left;
+        width: 80%;
+        margin: auto;
+    }
+}
+
+@media (min-width: 840px) {
+    #filtered-container table {
+        text-align: left;
+        width: 840px;
+        margin: auto;
+    }
+}
+
 #scene-container {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 30px;
     margin-bottom: 10px;
     position: relative;
     text-align: center;

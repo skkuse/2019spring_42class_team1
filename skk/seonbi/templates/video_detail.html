@@ -7,13 +7,25 @@ var refresh = function() {
     $.get("/api/videos/{{video_id}}", function (data) {
         var video = data.video;
         var detectedScenes = data.detected_scenes;
+        var filteredResults = data.filtered_results;
         if (!$("#video").attr("src") && video.url) {
-            $("#video").attr("src", video.url)
+            $("#video").attr("src", video.url);
         }
         $("#scene-table-body").empty()
         for (i = 0; i < detectedScenes.length; i++) {
-            var scene = detectedScenes[i]
+            var scene = detectedScenes[i];
             $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} ~ ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
+        }
+
+        if (filteredResults.length == 0) {
+            $("#filtered-container").attr("style", "display: hidden");
+        } else {
+            $("#filtered-container").attr("style", "display: block");
+        }
+        $("#filtered-table-body").empty()
+        for (i = 0; i < filteredResults.length; i++) {
+            var filteredResult = filteredResults[i];
+            $("#filtered-table-body").append(`<tr class="clickable-row" data-id=${filteredResult.id}><td>${filteredResult.created_at}</td><td>${filteredResult.status}</td></tr>`);
         }
 
         if (video.status == "UPLOADING") {
@@ -89,6 +101,17 @@ $(document).ready(function() {
             <div id="video-uploading">동영상 업로드 중입니다.</div>
             <video id="video" src="{{ video.url }}" autobuffer controls></video>
         </div>
+    </div>
+    <div id="filtered-container">
+        <table class="table table-hover">
+            <thead>
+                <th scope="col">Created At</th>
+                <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody id="filtered-table-body">
+            </tbody>
+        </table>
     </div>
     <div id="scene-container">
         <div id=scene-detecting>선정적인 장면을 탐색 중입니다.</div>
