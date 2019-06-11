@@ -3,6 +3,40 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'video_detail.css' %}">
 <script type="text/javascript">
+    var setFilteredResultItems = function (items) {
+        var container = $("#filtered-container");
+        if (items.length == 0) {
+            container.attr("style", "display: none");
+        } else {
+            container.attr("style", "display: block");
+        }
+        var tbbody = $("#filtered-table-body");
+        tbbody.empty();
+        for (i = 0; i < items.length; i++) {
+            var item = items[i];
+            tbbody.append(`<tr class="clickable-row" data-id=${item.id}><td>${item.created_at}</td><td>${item.status}</td></tr>`);
+        }
+    };
+
+    var setDetectedScenes = function (items) {
+        var tbbody = $("#scene-table-body");
+        var modalbody = $("#sceneIdSelectorBody");
+        tbbody.empty();
+        for (i = 0; i < items.length; i++) {
+            var item = items[i];
+            tbbody.append(`<tr class="clickable-row" data-id=${item.id}><td>${item.start_millis / 1000} - ${item.end_millis / 1000}</td><td>${item.cause}</td></tr>`)
+            modalbody.append(`<div class="custom-control custom-checkbox scene-selector-item"><input type="checkbox" class="custom-control-input" id=${item.id}><label class="custom-control-label" for=${item.id}>${item.start_millis / 1000} - ${item.end_millis / 1000} : ${item.cause}</label></div>`)
+        }
+        $("#scene-table-body .clickable-row").click(function(e) {
+            var targetItem = items.find(item => item.id == $(e.currentTarget).attr("data-id"));
+            if (targetItem) {
+                var videoTag = document.getElementById('video');
+                videoTag.currentTime = targetItem.start_millis / 1000;
+                videoTag.play();
+            }
+        });
+    };
+
     var refresh = function () {
         $.get("/api/videos/{{video_id}}", function (data) {
             var video = data.video;
@@ -11,23 +45,8 @@
             if (!$("#video").attr("src") && video.url) {
                 $("#video").attr("src", video.url);
             }
-            $("#scene-table-body").empty()
-            for (i = 0; i < detectedScenes.length; i++) {
-                var scene = detectedScenes[i];
-                $("#scene-table-body").append(`<tr class="clickable-row" data-id=${scene.id}><td>${scene.start_millis / 1000} - ${scene.end_millis / 1000}</td><td>${scene.cause}</td></tr>`);
-                $("#sceneIdSelectorBody").append(`<div class="custom-control custom-checkbox scene-selector-item"><input type="checkbox" class="custom-control-input" id=${scene.id}><label class="custom-control-label" for=${scene.id}>${scene.start_millis / 1000} - ${scene.end_millis / 1000} : ${scene.cause}</label></div>`)
-            }
-
-            if (filteredResults.length == 0) {
-                $("#filtered-container").attr("style", "display: hidden");
-            } else {
-                $("#filtered-container").attr("style", "display: block");
-            }
-            $("#filtered-table-body").empty()
-            for (i = 0; i < filteredResults.length; i++) {
-                var filteredResult = filteredResults[i];
-                $("#filtered-table-body").append(`<tr class="clickable-row" data-id=${filteredResult.id}><td>${filteredResult.created_at}</td><td>${filteredResult.status}</td></tr>`);
-            }
+            setDetectedScenes(detectedScenes);
+            setFilteredResultItems(filteredResults);
 
             if (video.status == "UPLOADING") {
                 $("#video").attr("style", "visibility:hidden");
@@ -77,7 +96,7 @@
                     checkedList.push(Number(checkbox.attr("id")));
                 }
             });
-            
+
             $.post({
                 url: "/api/videos/{{video_id}}/",
                 dataType: "json",
@@ -92,7 +111,8 @@
             })
         });
 
-        $("#make-remove").click(function () {var checkedList = [];
+        $("#make-remove").click(function () {
+            var checkedList = [];
             var checkedList = new Array();
             $(".scene-selector-item input").each(function (idx, e) {
                 var checkbox = $(e);
@@ -112,10 +132,6 @@
                     window.location = "/videos/{{video_id}}/filter/" + result.id;
                 }
             })
-        });
-
-        $(".clickable-row").click(function () {
-            console.log("click")
         });
     });
 </script>
