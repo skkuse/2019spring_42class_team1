@@ -16,6 +16,13 @@
             var item = items[i];
             tbbody.append(`<tr class="clickable-row" data-id=${item.id}><td>${item.created_at}</td><td>${item.status}</td></tr>`);
         }
+
+        $("#filtered-table-body .clickable-row").click(function(e) {
+            var targetItem = items.find(item => item.id == $(e.currentTarget).attr("data-id"));
+            if (targetItem) {
+                window.open(`/videos/{{video_id}}/filter/${targetItem.id}`)
+            }
+        });
     };
 
     var setDetectedScenes = function (items) {
