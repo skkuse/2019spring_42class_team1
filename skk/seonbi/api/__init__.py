@@ -1,3 +1,4 @@
+import json
 import seonbi.tasks as task
 from django.http import JsonResponse
 from seonbi.models import Video, DetectedScene, FilteredResult
@@ -7,7 +8,7 @@ def video_detail(request, video_id):
     if request.method == 'DELETE':
         return delete_video(request, video_id)
     if request.method == 'POST':
-        return filter_video(request, video_id, request.POST.getlist('scene_ids', list()), request.POST.get('removal', False))
+        return filter_video(request, video_id, request.POST.getlist('scene_ids', list()), json.loads(request.POST.get('removal', 'false')))
     return get_video_detail(request, video_id)
 
 
